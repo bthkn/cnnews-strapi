@@ -24,8 +24,8 @@ export default ({ env }) => ({
       },
     },
   },
-  'cnnews': {
-    enabled: true,
-    resolve: 'src/plugins/cnnews-llm',
-  },
+  // 'cnnews': {
+  //   enabled: true,
+  //   resolve: 'src/plugins/cnnews-llm',
+  // },
 });
