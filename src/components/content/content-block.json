@@ -1,0 +1,30 @@
+{
+  "collectionName": "components_content_content_blocks",
+  "info": {
+    "displayName": "Content Block",
+    "icon": "puzzle"
+  },
+  "options": {},
+  "attributes": {
+    "Text": {
+      "type": "blocks"
+    },
+    "Image": {
+      "allowedTypes": [
+        "images",
+        "files"
+      ],
+      "type": "media",
+      "multiple": false
+    },
+    "Type": {
+      "type": "enumeration",
+      "enum": [
+        "text",
+        "media"
+      ],
+      "required": true,
+      "default": "text"
+    }
+  }
+}

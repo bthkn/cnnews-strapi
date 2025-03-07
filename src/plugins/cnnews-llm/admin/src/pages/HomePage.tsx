@@ -2,7 +2,6 @@ import * as React from 'react';
 import { NavLink, useLocation, useNavigate } from 'react-router-dom';
 import { useIntl } from 'react-intl';
 
-
 import { Main, Flex, Typography, Status, IconButton, Dialog } from '@strapi/design-system';
 import { Pencil, Trash } from '@strapi/icons';
 
@@ -16,21 +15,50 @@ import { getTranslation } from '../utils/getTranslation';
 const HomePage = () => {
   const { formatMessage } = useIntl();
 
+  const [data, setData] = React.useState<object[]>([]);
+
+  const url = 'https://llm.cnnews.xplr.ru/v1/agent-profile/?page=1&page_size=10'
+
+  React.useEffect(() => {
+    let ignore = false;
+    fetch(url)
+      .then(response => response.json())
+      .then(json => {
+        if (!ignore) {
+          setData(json.data.map((agentData) => {
+            const { uuid, llm_uuid, agent, name, ...other } = agentData;
+            return {
+              id: uuid,
+              llmId: llm_uuid,
+              agent: agent,
+              name: name,
+              config: {
+                ...other,
+              }
+            }
+          }));
+        }
+      });
+    return () => {
+      ignore = true;
+    };
+  }, [url]);
+
   const canRead = true;
   const canDelete = true;
 
   const headers = TABLE_HEADERS;
-  const users: object[] = [
-    {
-      id: 1,
-      firstname: 'user',
-      lastname: 'test1',
-      email: 'a@b.c',
-    }
-  ]
+  // const users: object[] = [
+  //   {
+  //     id: 1,
+  //     firstname: 'user',
+  //     lastname: 'test1',
+  //     email: 'a@b.c',
+  //   }
+  // ]
 
-  const handleRowClick = (userId: number) => { alert(userId) }
-  const handleDeleteClick = (userId: number) => { alert(userId) }
+  const handleRowClick = (userId: number) => () => { alert(userId) }
+  const handleDeleteClick = (userId: number) => () => { alert(userId) }
 
   return (
     <Page.Main>
@@ -53,7 +81,7 @@ const HomePage = () => {
         }
       /> */}
       <Layouts.Content>
-        <Table.Root rows={users} headers={headers}>
+        <Table.Root rows={data} headers={headers}>
           <Table.ActionBar />
           <Table.Content>
             <Table.Head>
@@ -65,17 +93,17 @@ const HomePage = () => {
             <Table.Empty />
             <Table.Loading />
             <Table.Body>
-              {users.map((user) => (
+              {data.map((agent) => (
                 <Table.Row
-                  key={user.id}
-                  onClick={handleRowClick(user.id)}
+                  key={agent.id}
+                  onClick={handleRowClick(agent.id)}
                   cursor={canRead ? 'pointer' : 'default'}
                 >
-                  {canDelete ? <Table.CheckboxCell id={user.id} /> : null}
+                  {canDelete ? <Table.CheckboxCell id={agent.id} /> : null}
                   {headers.map(({ name, ...rest }) => {
                     return (
                       <Table.Cell key={name}>
-                        <Typography textColor="neutral800">{user[name] || '-'}</Typography>
+                        <Typography textColor="neutral800">{agent[name] || '-'}</Typography>
                       </Table.Cell>
                     );
                   })}
@@ -86,7 +114,7 @@ const HomePage = () => {
                           // <IconButton tag={NavLink} to={user.id.toString()} label="Edit" variant="ghost" withTooltip={false}><Pencil /></IconButton>
                           <TooltipProvider
                             button={
-                              <IconButton tag={NavLink} to={user.id.toString()} label="Edit" variant="ghost" withTooltip={false}>
+                              <IconButton tag={NavLink} to={agent.id.toString()} label="Edit" variant="ghost" withTooltip={false}>
                                 <Pencil />
                               </IconButton>
                             }
@@ -97,7 +125,7 @@ const HomePage = () => {
                           // <IconButton onClick={handleDeleteClick(user.id)} label="Delete" variant="ghost" withTooltip={false}><Trash /></IconButton>
                           <TooltipProvider
                             button={
-                              <IconButton onClick={handleDeleteClick(user.id)} label="Delete" variant="ghost" withTooltip={false}>
+                              <IconButton onClick={handleDeleteClick(agent.id)} label="Delete" variant="ghost" withTooltip={false}>
                                 <Trash />
                               </IconButton>
                             }
@@ -125,21 +153,39 @@ const HomePage = () => {
   );
 };
 
+// const TABLE_HEADERS: Array<object> = [
+//   {
+//     name: 'firstname',
+//     label: 'Firstname',
+//     sortable: true,
+//   },
+//   {
+//     name: 'lastname',
+//     label: 'Lastname',
+//     sortable: true,
+//   },
+//   {
+//     name: 'email',
+//     label: 'Email',
+//     sortable: true,
+//   },
+// ];
+
 const TABLE_HEADERS: Array<object> = [
   {
-    name: 'firstname',
-    label: 'Firstname',
+    name: 'agent',
+    label: 'Agent',
+    sortable: false,
+  },
+  {
+    name: 'name',
+    label: 'Name',
     sortable: true,
   },
   {
-    name: 'lastname',
-    label: 'Lastname',
-    sortable: true,
-  },
-  {
-    name: 'email',
-    label: 'Email',
-    sortable: true,
+    name: 'llmId',
+    label: 'Model ID',
+    sortable: false,
   },
 ];
 
