@@ -1,0 +1,2 @@
+"use strict";const t=({strapi:e})=>{},o=({strapi:e})=>{},c=({strapi:e})=>{},n={default:{},validator(){}},r={},i=({strapi:e})=>({index(s){s.body=e.plugin("cnnews-llm").service("service").getWelcomeMessage()}}),l={controller:i},a={},p={},d=[{method:"GET",path:"/",handler:"controller.index",config:{policies:[]}}],g=({strapi:e})=>({getWelcomeMessage(){return"Welcome to Strapi 🚀"}}),m={service:g},u={register:c,bootstrap:t,destroy:o,config:n,controllers:l,routes:d,services:m,contentTypes:r,policies:p,middlewares:a};module.exports=u;
+//# sourceMappingURL=index.js.map
