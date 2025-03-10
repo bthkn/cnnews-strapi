@@ -1,3 +1,11 @@
+# FROM node:20-alpine AS pluginbuilder
+# WORKDIR /tmp/cnnews-llm-plugin
+# COPY src/plugins/cnnews-llm ./
+# RUN npm install && \
+#     NODE_ENV=development npm run build && \
+#     rm -r node_modules
+
+
 FROM node:20-alpine
 
 ARG NODE_ENV=development
@@ -25,11 +33,14 @@ ENV PATH=/opt/node_modules/.bin:$PATH
 
 WORKDIR /opt/app
 COPY . .
+# COPY --from=pluginbuilder /tmp/cnnews-llm-plugin/dist/ /opt/app/src/plugins/cnnews-llm/dist/
 
 WORKDIR /opt/app/src/plugins/cnnews-llm
 RUN npm install && \
     npm run build && \
-    rm -r node_modules
+    rm -r node_modules && \
+    rm -r admin && \
+    rm -r server
 
 WORKDIR /opt/app
 RUN npm run build && \
