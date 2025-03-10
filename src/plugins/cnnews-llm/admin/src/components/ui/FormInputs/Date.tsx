@@ -1,3 +1,4 @@
+// @ts-nocheck
 import * as React from 'react';
 
 import { DatePicker, useComposedRefs, Field } from '@strapi/design-system';

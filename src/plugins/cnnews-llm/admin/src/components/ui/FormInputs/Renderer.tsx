@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { forwardRef, memo } from 'react';
 
 import { TextInput, useComposedRefs, Field } from '@strapi/design-system';

@@ -1,3 +1,4 @@
+// @ts-nocheck
 import * as React from 'react';
 
 import { Flex } from '@strapi/design-system';

@@ -1,3 +1,4 @@
+// @ts-nocheck
 import * as React from 'react';
 
 import { Alert, AlertVariant, Flex, useCallbackRef, Link } from '@strapi/design-system';

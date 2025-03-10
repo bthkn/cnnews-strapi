@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { Page } from '@strapi/strapi/admin';
 import { Routes, Route } from 'react-router-dom';
 

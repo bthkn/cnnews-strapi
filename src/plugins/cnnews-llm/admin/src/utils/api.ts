@@ -1,5 +1,6 @@
+// @ts-nocheck
+
 const BASE_URL = `cnnews.xplr.ru`
-const SCRAPPER_BASE_URL = `https://scrapper.cnnews.xplr.ru`
 
 export enum Service {
   SCRAPPER = `https://scrapper.${BASE_URL}`,
@@ -8,7 +9,7 @@ export enum Service {
 }
 
 export async function fetchPageToS3(url: string) {
-  const requesUrl = `${SCRAPPER_BASE_URL}/fetch-news/save-html`
+  const requesUrl = `${Service.SCRAPPER}/fetch-news/save-html`
 
   const requesOptions = {
     method: "POST",

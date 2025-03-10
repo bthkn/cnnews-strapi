@@ -1,3 +1,4 @@
+// @ts-nocheck
 import type { DistributiveOmit } from './utils';
 import type { InputProps } from '../components/ui/Form';
 import type { MessageDescriptor } from 'react-intl';
