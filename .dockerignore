@@ -1,0 +1,68 @@
+Dockerfile
+.dockerignore
+compose.yml
+README.md
+.git
+.github
+.gitignore
+
+.env
+
+dist/
+build/
+exports/
+public/uploads/*
+!public/uploads/.gitkeep
+.tmp/
+
+# Strapi
+exports
+.strapi
+.strapi-updater.json
+.strapi-cloud.json
+
+# JavaScript
+node_modules/
+.cache/
+\*.tsbuildinfo
+.npm
+
+# Environment
+venv/
+.venv/
+.env
+
+# SQLite
+*.db
+*.sqlite3
+*.sqlite3-journal
+
+# Logs
+logs
+*.log
+
+# Editor directories and files
+.vscode/
+.history/
+*.code-workspace
+.idea/
+*.iws
+
+# macOS
+._*
+.DS_Store
+.fseventsd
+.Spotlight-V100
+
+# Linux
+*~
+.fuse_hidden*
+.directory
+.Trash-*
+.nfs*
+
+# Windows
+Thumbs.db*
+ehthumbs*.db
+[Dd]esktop.ini
+$RECYCLE.BIN/

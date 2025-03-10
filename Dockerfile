@@ -35,12 +35,14 @@ WORKDIR /opt/app
 COPY . .
 # COPY --from=pluginbuilder /tmp/cnnews-llm-plugin/dist/ /opt/app/src/plugins/cnnews-llm/dist/
 
-# WORKDIR /opt/app/src/plugins/cnnews-llm
-# RUN npm install && \
-#     npm run build && \
-#     rm -r node_modules
+WORKDIR /opt/app/src/plugins/cnnews-llm
+RUN npm install && \
+    npm run build && \
+    rm -r node_modules && \
+    rm -r admin && \
+    rm -r server
 
-# WORKDIR /opt/app
+WORKDIR /opt/app
 RUN npm run build && \
     chown -R node:node /opt/app
 
