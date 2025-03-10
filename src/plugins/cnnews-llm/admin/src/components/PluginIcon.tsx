@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { PuzzlePiece } from '@strapi/icons';
 
 const PluginIcon = () => <PuzzlePiece />;

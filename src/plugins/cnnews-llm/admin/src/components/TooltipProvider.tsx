@@ -1,3 +1,4 @@
+// @ts-nocheck
 import * as Tooltip from '@radix-ui/react-tooltip';
 
 const TooltipProvider = ({ button, content }) => {

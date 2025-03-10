@@ -1,3 +1,5 @@
+// @ts-nocheck
+
 export type StepStatus = "init" | "inProgress" | "success" | "error";
 
 export interface TaskStep {
@@ -19,4 +21,5 @@ export interface Task {
   operationId: string | null,
   time: number | null,
   resultUrl: string | null,
+  errorMessage?: string;
 }

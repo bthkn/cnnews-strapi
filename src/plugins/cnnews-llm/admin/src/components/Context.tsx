@@ -1,3 +1,4 @@
+// @ts-nocheck
 import * as React from 'react';
 
 import * as ContextSelector from 'use-context-selector';

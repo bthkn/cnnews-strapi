@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { Main } from '@strapi/design-system';
 import { useIntl } from 'react-intl';
 

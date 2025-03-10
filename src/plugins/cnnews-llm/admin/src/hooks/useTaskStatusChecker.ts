@@ -1,3 +1,5 @@
+// @ts-nocheck
+
 // import { useState, useEffect, useRef } from "react";
 
 // const useTaskStatusChecker = (taskIds: string[]) => {

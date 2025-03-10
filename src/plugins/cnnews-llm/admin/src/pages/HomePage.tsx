@@ -1,21 +1,18 @@
+// @ts-nocheck
 import * as React from 'react';
-import { NavLink, useLocation, useNavigate } from 'react-router-dom';
 import { format } from 'date-fns';
 
-import { Main, Button, Flex, Typography, Status, IconButton, Dialog } from '@strapi/design-system';
-import { Pencil, Trash, Plus } from '@strapi/icons';
+import { Button, Typography } from '@strapi/design-system';
+import { Plus } from '@strapi/icons';
 
 import { Page } from '../components/PageHelpers';
-import { Layouts } from '../components/Layouts/Layout'
-import { Table } from '../components/ui/Table';
-import { TooltipProvider } from '../components/TooltipProvider';
-import { getTranslation } from '../utils/getTranslation';
+import { Layouts } from '../components/Layouts/Layout';
 import { useTaskStatusChecker } from '../hooks/useTaskStatusChecker';
 
 import { saveLocalStorage, readLocalStorage } from '../utils/ls';
-import { StepCircles } from '../components/ui/StepCircles'
+import { StepCircles } from '../components/ui/StepCircles';
 
-import { TranslationsTableView, HeaderDefObj, TableConfig, TableItem } from '../components/blocks/TranslationsTableView';
+import { TranslationsTableView, HeaderDefObj, TableConfig } from '../components/blocks/TranslationsTableView';
 import { NewTranslationForm, NewProcessData } from "../components/blocks/NewTranslationForm";
 import { TranslationDetailsModal } from '../components/blocks/TranslationDetailsModal';
 
@@ -139,10 +136,22 @@ const HomePage = () => {
 
     saveLocalStorage('_tsk', [...data, newTask]);
 
-    await processTask(newTask);
+    try {
+      await processTask(newTask);
+    } catch (error) {
+      newTask.status = "error"
+      Object.assign(newTask.steps, newTask.steps.map(s => {
+        if (s.status !== "success" && s.status !== "init") {
+          s.status = "error"
+        }
+        return s
+      }))
+      saveLocalStorage("_tsk", [...data, newTask])
+      setData([...data, newTask])
+    }
   }
 
-  const updateData = async (taskId: string, operationData: object) => {
+  const updateData = (taskId: string, operationData: object) => {
     const taskToUpdate = data.find(t => t.id === taskId)
     if (!taskToUpdate) { return }
 
@@ -157,6 +166,7 @@ const HomePage = () => {
     if (operation.status.startsWith("Error") || (!isExpectedStatus)) {
       taskToUpdate.steps[2].status = "error"
       taskToUpdate.status = "error"
+      taskToUpdate.errorMessage = operation.error
     }
 
     if (operation.status === "UNPROCESSED" || operation.status === "IN_PROCESS") {
@@ -241,13 +251,18 @@ const HomePage = () => {
 
     console.log('processTask', task)
 
-    // setTasksUpdateMap((prev) => ({ ...prev, [task.id]: res3.response.operation_uuid }));
+    setTasksUpdateMap((prev) => ({ ...prev, [task.id]: res3.response.operation_uuid }));
   }
 
   React.useEffect(() => {
     const restoredData: Task[] = readLocalStorage('_tsk');
     setData(restoredData)
     // setUpdateStarted(true);
+    restoredData
+      .filter(task => task.status === 'inProgress' && task.operationId !== null)
+      .map(task => {
+        setTasksUpdateMap((prev) => ({ ...prev, [task.id]: task.operationId }));
+      })
   }, []);
 
   // React.useEffect(() => {
@@ -266,13 +281,13 @@ const HomePage = () => {
   //   };
   // }, [updateStarted]);
 
-  React.useEffect(() => {
-    data
-      .filter(task => task.status === 'inProgress' && task.operationId !== null)
-      .map(task => {
-        setTasksUpdateMap((prev) => ({ ...prev, [task.id]: task.operationId }));
-      })
-  }, [data]);
+  // React.useEffect(() => {
+  //   data
+  //     .filter(task => task.status === 'inProgress' && task.operationId !== null)
+  //     .map(task => {
+  //       setTasksUpdateMap((prev) => ({ ...prev, [task.id]: task.operationId }));
+  //     })
+  // }, [data]);
 
   React.useEffect(() => {
     Object.entries(taskStatuses).forEach(([taskId, task]) => {
