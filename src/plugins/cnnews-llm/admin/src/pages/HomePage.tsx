@@ -17,6 +17,7 @@ import { StepCircles } from '../components/ui/StepCircles'
 
 import { TranslationsTableView, HeaderDefObj, TableConfig, TableItem } from '../components/blocks/TranslationsTableView';
 import { NewTranslationForm, NewProcessData } from "../components/blocks/NewTranslationForm";
+import { TranslationDetailsModal } from '../components/blocks/TranslationDetailsModal';
 
 import { StepStatus, TaskStep, Task } from '../types/task';
 
@@ -63,14 +64,15 @@ const TABLE_HEADERS: Array<HeaderDefObj> = [
 
 const HomePage = () => {
   const [data, setData] = React.useState<Task[]>([]);
-  const [selectedItem, setSelectedItem] = React.useState<object>({});
+  const [selectedItem, setSelectedItem] = React.useState<Task>();
   const [isLoading, setIsLoading] = React.useState<boolean>(false);
   const [isModalOpened, setModalOpened] = React.useState<boolean>(false);
+  const [isDetailsModalOpened, setDetailsModalOpened] = React.useState<boolean>(false);
 
-  const [updateStarted, setUpdateStarted] = React.useState(false);
+  // const [updateStarted, setUpdateStarted] = React.useState(false);
 
-  const [tasksMap, setTasksMap] = React.useState<Record<string, string | null>>({});
-  const { taskStatuses, stopChecking } = useTaskStatusChecker(tasksMap);
+  const [tasksUpdateMap, setTasksUpdateMap] = React.useState<Record<string, string | null>>({});
+  const { taskStatuses, stopChecking } = useTaskStatusChecker(tasksUpdateMap);
 
   const tableConfig: TableConfig = {
     headerDefinition: TABLE_HEADERS,
@@ -91,14 +93,19 @@ const HomePage = () => {
     console.log(itemId)
   }
 
+  const handleDetailsToggle = () => {
+    setDetailsModalOpened((prev) => !prev)
+  }
+
   const handleDetailsClick = (itemId: string) => () => {
     console.log(itemId)
-    // const item = data.find((el) => el.id === itemId)
-    // if (!item) {
-    //   return
-    // }
-    // setSelectedItem({ ...item });
-    // setModalOpened((prev) => !prev)
+    const item = data.find((el) => el.id === itemId)
+    if (!item) {
+      return
+    }
+    console.log(item)
+    setSelectedItem({ ...item });
+    setDetailsModalOpened((prev) => !prev)
   }
 
   const handleToggle = async (newProcessData: NewProcessData | null) => {
@@ -135,15 +142,10 @@ const HomePage = () => {
     await processTask(newTask);
   }
 
-  // const updateData = async (taskId: string, operationId: string) => {
   const updateData = async (taskId: string, operationData: object) => {
     const taskToUpdate = data.find(t => t.id === taskId)
     if (!taskToUpdate) { return }
 
-    // const res = await api.operationById(operationId)
-    // if (res.error) { return }
-
-    // const { operation, info } = res.response
     const { operation, info } = operationData;
     const [step1, step2, step3] = info
 
@@ -214,11 +216,6 @@ const HomePage = () => {
     saveLocalStorage("_tsk", [...data, task])
     setData([...data, task])
 
-
-    // step3.status = "error"
-    // task.status = "error"
-    // return
-
     // STEP 3 - TRANSLATE
 
     step3.meta.reqData = {
@@ -243,43 +240,48 @@ const HomePage = () => {
     setData([...data, task])
 
     console.log('processTask', task)
-    setInterval(async () => await updateData(task.id, res3.response.operation_uuid), 2500);
 
-    setTasksMap((prev) => ({ ...prev, [task.id]: res3.response.operation_uuid }));
+    // setTasksUpdateMap((prev) => ({ ...prev, [task.id]: res3.response.operation_uuid }));
   }
 
   React.useEffect(() => {
-    const savedData: Task[] = readLocalStorage('_tsk');
-    setData(savedData)
-    setUpdateStarted(true);
+    const restoredData: Task[] = readLocalStorage('_tsk');
+    setData(restoredData)
+    // setUpdateStarted(true);
   }, []);
 
-  React.useEffect(() => {
-    if (!updateStarted) return;
+  // React.useEffect(() => {
+  //   if (!updateStarted) return;
 
-    const intervals = data
+  //   const intervals = data
+  //     .filter(task => task.status === 'inProgress' && task.operationId !== null)
+  //     .map(task => {
+  //       console.log(task)
+  //       return setInterval(async () => await updateData(task.id, task.operationId), 2500)
+  //     })
+  //   console.log(intervals)
+
+  //   return () => {
+  //     intervals.map(interval => clearInterval(interval))
+  //   };
+  // }, [updateStarted]);
+
+  React.useEffect(() => {
+    data
       .filter(task => task.status === 'inProgress' && task.operationId !== null)
       .map(task => {
-        console.log(task)
-        return setInterval(async () => await updateData(task.id, task.operationId), 2500)
+        setTasksUpdateMap((prev) => ({ ...prev, [task.id]: task.operationId }));
       })
-    console.log(intervals)
-
-    return () => {
-      intervals.map(interval => clearInterval(interval))
-    };
-  }, [updateStarted]);
+  }, [data]);
 
   React.useEffect(() => {
     Object.entries(taskStatuses).forEach(([taskId, task]) => {
       if (!task) return;
       console.log(`Статус задачи ${taskId} обновлен:`, task.operation.status);
-
       if (task.operation.status === "OK" || task.operation.status === "ERROR") {
         console.log(`Задача ${taskId} завершена, удаляем интервал`);
         stopChecking(taskId);
       }
-
       updateData(taskId, task);
     });
   }, [taskStatuses]);
@@ -287,16 +289,19 @@ const HomePage = () => {
   return (
     <Page.Main>
       <Page.Title>Переводы</Page.Title>
+
       <Layouts.Header
         primaryAction={null}
         title='Переводы'
       // subtitle='All the users who have access to the Strapi admin panel'
       />
+
       <Layouts.Action
         startActions={
           <Button type="primary" onClick={() => setModalOpened((prev) => !prev)} startIcon={<Plus />}>Перевод</Button>
         }
       />
+
       <Layouts.Content>
         <TranslationsTableView
           tableData={data}
@@ -311,6 +316,8 @@ const HomePage = () => {
         headerTitle="Новый Перевод"
         onToggle={(newProcessData) => { handleToggle(newProcessData) }}
       />}
+
+      {isDetailsModalOpened && <TranslationDetailsModal taskData={selectedItem} onToggle={handleDetailsToggle} />}
     </Page.Main>
   );
 };

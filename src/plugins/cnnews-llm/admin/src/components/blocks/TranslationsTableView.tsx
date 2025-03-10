@@ -76,7 +76,7 @@ const TranslationsTableView = ({
               {tableConfig.canRead ? (
                 <Table.Cell onClick={(e: Event) => e.stopPropagation()}>
                   <Flex justifyContent="end" gap={2}>
-                    {tableConfig.canView && (
+                    {/* {tableConfig.canView && (
                       <TooltipProvider
                         button={
                           <IconButton onClick={onDetailsBtnClick(item.id)} label="View Details" variant="ghost" withTooltip={false}>
@@ -85,7 +85,7 @@ const TranslationsTableView = ({
                         }
                         content="View Details"
                       />
-                    )}
+                    )} */}
                     {item.status === "success" && (
                       <LinkButton
                         isExternal={true}
