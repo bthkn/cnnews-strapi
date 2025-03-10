@@ -10,6 +10,7 @@ import { Layouts } from '../components/Layouts/Layout'
 import { Table } from '../components/ui/Table';
 import { TooltipProvider } from '../components/TooltipProvider';
 import { getTranslation } from '../utils/getTranslation';
+import { useTaskStatusChecker } from '../hooks/useTaskStatusChecker';
 
 import { saveLocalStorage, readLocalStorage } from '../utils/ls';
 import { StepCircles } from '../components/ui/StepCircles'
@@ -68,10 +69,13 @@ const HomePage = () => {
 
   const [updateStarted, setUpdateStarted] = React.useState(false);
 
+  const [tasksMap, setTasksMap] = React.useState<Record<string, string | null>>({});
+  const { taskStatuses, stopChecking } = useTaskStatusChecker(tasksMap);
+
   const tableConfig: TableConfig = {
     headerDefinition: TABLE_HEADERS,
     canRead: true,
-    canDelete: false,
+    canView: true,
     needCheckbox: false,
   }
 
@@ -87,7 +91,7 @@ const HomePage = () => {
     console.log(itemId)
   }
 
-  const handleEditClick = (itemId: number | string) => () => {
+  const handleDetailsClick = (itemId: string) => () => {
     console.log(itemId)
     // const item = data.find((el) => el.id === itemId)
     // if (!item) {
@@ -95,10 +99,6 @@ const HomePage = () => {
     // }
     // setSelectedItem({ ...item });
     // setModalOpened((prev) => !prev)
-  }
-
-  const handleDeleteClick = (itemId: number | string) => () => {
-    console.log(itemId)
   }
 
   const handleToggle = async (newProcessData: NewProcessData | null) => {
@@ -133,26 +133,31 @@ const HomePage = () => {
     saveLocalStorage('_tsk', [...data, newTask]);
 
     await processTask(newTask);
-
-
   }
 
-  const updateData = async (taskId: string, operationId: string) => {
+  // const updateData = async (taskId: string, operationId: string) => {
+  const updateData = async (taskId: string, operationData: object) => {
     const taskToUpdate = data.find(t => t.id === taskId)
     if (!taskToUpdate) { return }
 
-    const res = await api.operationById(operationId)
-    if (res.error) { return }
+    // const res = await api.operationById(operationId)
+    // if (res.error) { return }
 
-    const { operation, info } = res.response
+    // const { operation, info } = res.response
+    const { operation, info } = operationData;
     const [step1, step2, step3] = info
 
-    if (operation.status.startsWith("Error") || (operation.status !== "OK" && operation.status !== "UNPROCESSED")) {
+    const isExpectedStatus = (
+      operation.status === "OK"
+      && operation.status === "UNPROCESSED"
+      && operation.status === "IN_PROCESS")
+
+    if (operation.status.startsWith("Error") || (!isExpectedStatus)) {
       taskToUpdate.steps[2].status = "error"
       taskToUpdate.status = "error"
     }
 
-    if (operation.status === "UNPROCESSED") {
+    if (operation.status === "UNPROCESSED" || operation.status === "IN_PROCESS") {
       taskToUpdate.steps[2].status = "inProgress"
       taskToUpdate.status = "inProgress"
     }
@@ -164,8 +169,8 @@ const HomePage = () => {
       taskToUpdate.status = "success"
     }
 
-    saveLocalStorage("_tsk", [...data, taskToUpdate])
-    setData([...data, taskToUpdate])
+    saveLocalStorage("_tsk", [...data])
+    setData([...data])
   }
 
   const processTask = async (task: Task) => {
@@ -237,25 +242,15 @@ const HomePage = () => {
     saveLocalStorage("_tsk", [...data, task])
     setData([...data, task])
 
-
-    // Object.assign(tasks.value, readLocalStorage("_tsk"))
-
-    // const updateIntervalId = setInterval(async () => await updateData(task.id, res3.response.operation_uuid), 2500)
-
     console.log('processTask', task)
+    setInterval(async () => await updateData(task.id, res3.response.operation_uuid), 2500);
 
-    React.useEffect(() => {
-      const updateIntervalId = setInterval(async () => await updateData(task.id, res3.response.operation_uuid), 2500)
-      return () => {
-        clearInterval(updateIntervalId);
-      };
-    }, []);
-    // intervals.value.push(updateIntervalId)
+    setTasksMap((prev) => ({ ...prev, [task.id]: res3.response.operation_uuid }));
   }
 
   React.useEffect(() => {
     const savedData: Task[] = readLocalStorage('_tsk');
-    setData([...savedData])
+    setData(savedData)
     setUpdateStarted(true);
   }, []);
 
@@ -265,7 +260,7 @@ const HomePage = () => {
     const intervals = data
       .filter(task => task.status === 'inProgress' && task.operationId !== null)
       .map(task => {
-        console.log(intervals)
+        console.log(task)
         return setInterval(async () => await updateData(task.id, task.operationId), 2500)
       })
     console.log(intervals)
@@ -275,27 +270,40 @@ const HomePage = () => {
     };
   }, [updateStarted]);
 
+  React.useEffect(() => {
+    Object.entries(taskStatuses).forEach(([taskId, task]) => {
+      if (!task) return;
+      console.log(`Статус задачи ${taskId} обновлен:`, task.operation.status);
+
+      if (task.operation.status === "OK" || task.operation.status === "ERROR") {
+        console.log(`Задача ${taskId} завершена, удаляем интервал`);
+        stopChecking(taskId);
+      }
+
+      updateData(taskId, task);
+    });
+  }, [taskStatuses]);
+
   return (
     <Page.Main>
       <Page.Title>Переводы</Page.Title>
       <Layouts.Header
         primaryAction={null}
         title='Переводы'
-        // subtitle='All the users who have access to the Strapi admin panel'
+      // subtitle='All the users who have access to the Strapi admin panel'
       />
       <Layouts.Action
         startActions={
-          <Button type="primary" onClick={() => setModalOpened((prev) => !prev)} startIcon={<Plus/>}>Перевод</Button>
+          <Button type="primary" onClick={() => setModalOpened((prev) => !prev)} startIcon={<Plus />}>Перевод</Button>
         }
       />
       <Layouts.Content>
         <TranslationsTableView
           tableData={data}
           tableConfig={tableConfig}
-          isLoading={isLoading}
           onRowClick={handleRowClick}
-          onEditBtnClick={handleEditClick}
-          onDeleteBtnClick={handleDeleteClick}
+          onDetailsBtnClick={handleDetailsClick}
+          isLoading={isLoading}
         />
       </Layouts.Content>
 
