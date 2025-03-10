@@ -5,7 +5,7 @@ import { Page } from '../components/PageHelpers';
 import { Layouts } from '../components/Layouts/Layout'
 
 import { BasicTableView, HeaderDefObj, TableConfig, TableItem } from '../components/blocks/BasicTableView';
-import { ModelDetailsForm } from '../components/blocks/ModelDetailsForm'
+import { ModelDetailsForm } from '../components/blocks/ModelDetailsForm';
 
 const ModelProviders = {
   'bc1466ac-15f4-4515-80c5-037171260986': 'gitee.io Proxy',
@@ -119,7 +119,7 @@ const ModelsPage = () => {
     return () => {
       ignore = true;
     };
-  });
+  }, []);
 
   return (
     <Page.Main>

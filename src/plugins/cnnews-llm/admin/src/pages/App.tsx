@@ -27,13 +27,13 @@ const menuSections = [
     id: 2,
     title: "System",
     links: [
-      {
-        id: 1,
-        label: "База Знаний",
-        to: "rag",
-        hasNotification: false,
-        icon: false,
-      },
+      // {
+      //   id: 1,
+      //   label: "База Знаний",
+      //   to: "rag",
+      //   hasNotification: false,
+      //   icon: false,
+      // },
       {
         id: 2,
         label: "Процессы",

@@ -57,8 +57,6 @@ interface SidepanelNavProps {
 const SidepanelNav = ({ sections }: { sections: SidepanelNavSections[] }) => {
   const { pathname } = useLocation();
 
-  console.log('sections', sections)
-
   if (!sections) {
     return (
       <SubNav>

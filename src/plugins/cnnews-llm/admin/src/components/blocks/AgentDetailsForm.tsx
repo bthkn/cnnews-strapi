@@ -32,7 +32,7 @@ interface AgentDetailsData {
     tone: string;
     style: string;
     instructions: string;
-    keep_comments: true,
+    keep_comments: boolean,
   }
 }
 

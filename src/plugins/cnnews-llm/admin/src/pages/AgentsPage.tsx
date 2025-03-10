@@ -109,7 +109,7 @@ const AgentsPage = () => {
     return () => {
       ignore = true;
     };
-  });
+  }, []);
 
   return (
     <Page.Main>

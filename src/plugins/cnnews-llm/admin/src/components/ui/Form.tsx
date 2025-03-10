@@ -440,7 +440,7 @@ const Form = React.forwardRef<HTMLFormElement, FormProps>(
         onSubmit={handleSubmit}
         width={props.width}
         height={props.height}
-        style={{"overflow-y": "scroll"}}
+        style={{"overflowY": "scroll"}}
       >
         <FormProvider
           disabled={disabled}
