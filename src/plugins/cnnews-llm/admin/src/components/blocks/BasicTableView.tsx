@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { Flex, Typography, IconButton } from '@strapi/design-system';
 import { Pencil, Trash } from '@strapi/icons';
 

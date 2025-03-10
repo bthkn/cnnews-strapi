@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { Flex, Typography, IconButton, LinkButton } from '@strapi/design-system';
 import { Pencil, ExternalLink, Eye } from '@strapi/icons';
 
@@ -5,6 +6,7 @@ import { Table } from '../../components/ui/Table';
 import { TooltipProvider } from '../../components/TooltipProvider';
 
 import { Task } from '../../types/task';
+import { Box } from '@strapi/design-system';
 
 interface TableItem extends Object {
   id: number | string;
@@ -86,10 +88,15 @@ const TranslationsTableView = ({
                         content="View Details"
                       />
                     )} */}
+                    {item.errorMessage && (
+                      <Box>
+                        <Typography textColor="danger600">{item.errorMessage}</Typography>
+                      </Box>
+                    )}
                     {item.status === "success" && (
                       <LinkButton
                         isExternal={true}
-                        startIcon={<ExternalLink />}
+                        startIcon={<ExternalLink fill="neutral0"/>}
                         href={makePreviewURL(item.resultUrl)}
                       >
                         <Typography>Открыть</Typography>

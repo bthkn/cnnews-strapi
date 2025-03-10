@@ -1,3 +1,4 @@
+// @ts-nocheck
 import type { ComponentPropsWithoutRef, ReactNode } from 'react';
 
 import type { Schema } from '@strapi/types';

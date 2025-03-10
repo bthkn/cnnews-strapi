@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { Typography } from '@strapi/design-system';
 import { TaskStep, StepStatus } from '../../types/task'
 

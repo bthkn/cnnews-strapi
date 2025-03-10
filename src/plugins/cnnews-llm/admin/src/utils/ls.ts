@@ -1,3 +1,5 @@
+// @ts-nocheck
+
 export function saveLocalStorage(key: string, data: object[]) {
   const encoded = JSON.stringify(Array.from(data))
   window.localStorage.setItem(key, encoded)

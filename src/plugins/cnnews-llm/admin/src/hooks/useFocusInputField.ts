@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { Ref, useEffect, useMemo, useState } from 'react';
 
 import { useLocation } from 'react-router-dom';

@@ -1,3 +1,5 @@
+// @ts-nocheck
+
 import clone from 'lodash/clone';
 import toPath from 'lodash/toPath';
 

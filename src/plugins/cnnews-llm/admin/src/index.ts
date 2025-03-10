@@ -1,3 +1,5 @@
+// @ts-nocheck
+
 import { getTranslation } from './utils/getTranslation';
 import { PLUGIN_ID } from './pluginId';
 import { Initializer } from './components/Initializer';

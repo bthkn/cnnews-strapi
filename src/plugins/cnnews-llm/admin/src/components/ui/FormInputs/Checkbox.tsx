@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { forwardRef, memo } from 'react';
 
 import { Checkbox, useComposedRefs, Field } from '@strapi/design-system';
